@@ -20,12 +20,6 @@ DELAY_MS = int(os.getenv("VLLM_TPU_PROFILE_DELAY_MS", 0))
 def main(args: argparse.Namespace):
     print(args)
 
-    # import torch_xla.core.xla_model as xm
-    # device = xm.xla_device()
-    # _ = xp.start_server(9012)
-    # print all visible devices
-    # print(f"Visible devices: {xm.get_visible_devices()}")
-    # print(f"Using device: {device}")
     engine_args = EngineArgs.from_cli_args(args)
     llm = LLM(**dataclasses.asdict(engine_args))
     # _ = xp.start_server(9012)
@@ -45,43 +39,19 @@ def main(args: argparse.Namespace):
 
     def run_to_completion():
         start_time = time.perf_counter()
-        first_token_time = None
-        
-        # Use streaming to capture first token timing
-        outputs = llm.generate(dummy_prompts,
-                              sampling_params=sampling_params,
-                              use_tqdm=False,
-                              stream=True)
-        
-        # Process streaming outputs to find first token
-        for output in outputs:
-            if output.outputs and len(output.outputs) > 0:
-                first_output = output.outputs[0]
-                if hasattr(first_output, 'token_ids') and first_output.token_ids:
-                    # This is the first token - record the time
-                    if first_token_time is None:
-                        first_token_time = time.perf_counter()
-                    # Continue processing to completion
-                    continue
-        
+        llm.generate(dummy_prompts,
+                     sampling_params=sampling_params,
+                     use_tqdm=False)
         end_time = time.perf_counter()
         latency = end_time - start_time
-        ttft = first_token_time - start_time if first_token_time else None
-        
-        return latency, ttft
+        return latency
 
     # Warmup
     print("Warming up...")
     warmup_latencies = []
-    warmup_ttfts = []
     for _ in tqdm(range(args.num_iters_warmup), desc="Warmup iterations"):
-        latency, ttft = run_to_completion()
-        warmup_latencies.append(latency)
-        if ttft is not None:
-            warmup_ttfts.append(ttft)
+        warmup_latencies.append(run_to_completion())
     print(f"Average warmup latency: {np.mean(warmup_latencies):.4f}s")
-    if warmup_ttfts:
-        print(f"Average warmup TTFT: {np.mean(warmup_ttfts):.4f}s")
 
     # Profile
     profile_dir = args.profile_result_dir
@@ -94,19 +64,9 @@ def main(args: argparse.Namespace):
     if DELAY_MS == 0:
         time.sleep(1.0)
     profile_latencies = []
-    profile_ttfts = []
     for _ in tqdm(range(args.num_iters), desc="Profile iterations"):
-        latency, ttft = run_to_completion()
-        profile_latencies.append(latency)
-        if ttft is not None:
-            profile_ttfts.append(ttft)
+        profile_latencies.append(run_to_completion())
     print(f"Average profile latency: {np.mean(profile_latencies):.4f}s")
-    if profile_ttfts:
-        print(f"Average profile TTFT: {np.mean(profile_ttfts):.4f}s")
-        print(f"TTFT statistics:")
-        print(f"  Min TTFT: {np.min(profile_ttfts):.4f}s")
-        print(f"  Max TTFT: {np.max(profile_ttfts):.4f}s")
-        print(f"  Std TTFT: {np.std(profile_ttfts):.4f}s")
 
     return
 
@@ -140,7 +100,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     main(args)
 
-
 # export XLA_HLO_DEBUG=1
 # export MODEL=meta-llama/Llama-3.1-70B-Instruct
 # export VLLM_TPU_PROFILE_DURATION_MS=2000
@@ -164,10 +123,10 @@ if __name__ == '__main__':
 # export VLLM_TPU_PROFILE_DURATION_MS=3000
 # export VLLM_TPU_PROFILE_DELAY_MS=0
 
-# python3 profiling.py \
-#     --model $MODEL \
-#     --input-len 1024 --output-len 1 \
-#     --batch-size 1 --enforce-eager \
-#     --max-model-len 2048 \
-#     --tensor-parallel-size 1 \
-#     --profile-result-dir profiles
+python3 tpu_profiling.py \
+    --model $MODEL \
+    --input-len 4096 --output-len 128 \
+    --batch-size 512 --enforce-eager \
+    --max-model-len 2048 \
+    --tensor-parallel-size 1 \
+    --profile-result-dir profiles
