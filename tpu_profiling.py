@@ -22,13 +22,13 @@ def main(args: argparse.Namespace):
 
     # import torch_xla.core.xla_model as xm
     # device = xm.xla_device()
-    _ = xp.start_server(9012)
+    # _ = xp.start_server(9012)
     # print all visible devices
     # print(f"Visible devices: {xm.get_visible_devices()}")
     # print(f"Using device: {device}")
     engine_args = EngineArgs.from_cli_args(args)
     llm = LLM(**dataclasses.asdict(engine_args))
-    # _ = xp.start_server(9012)
+    _ = xp.start_server(9012)
 
     sampling_params = SamplingParams(
         temperature=0.0,
