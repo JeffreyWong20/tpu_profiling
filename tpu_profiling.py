@@ -28,7 +28,7 @@ def main(args: argparse.Namespace):
     # print(f"Using device: {device}")
     engine_args = EngineArgs.from_cli_args(args)
     llm = LLM(**dataclasses.asdict(engine_args))
-    _ = xp.start_server(9012)
+    # _ = xp.start_server(9012)
 
     sampling_params = SamplingParams(
         temperature=0.0,
@@ -63,10 +63,10 @@ def main(args: argparse.Namespace):
     profile_dir = args.profile_result_dir
     print(f"Profiling (results will be saved to '{profile_dir}')...")
     # Enable tracing on server
-    xp.trace_detached("localhost:9012",
-                      profile_dir,
-                      delay_ms=DELAY_MS,
-                      duration_ms=DURATION_MS)
+    # xp.trace_detached("localhost:9012",
+    #                   profile_dir,
+    #                   delay_ms=DELAY_MS,
+    #                   duration_ms=DURATION_MS)
     if DELAY_MS == 0:
         time.sleep(1.0)
     profile_latencies = []
