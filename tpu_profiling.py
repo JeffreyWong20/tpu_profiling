@@ -22,8 +22,9 @@ def main(args: argparse.Namespace):
 
     import torch_xla.core.xla_model as xm
     device = xm.xla_device()
+    _ = xp.start_server(9012)
     # print all visible devices
-    print(f"Visible devices: {xm.get_visible_devices()}")
+    # print(f"Visible devices: {xm.get_visible_devices()}")
     print(f"Using device: {device}")
     print(f"Device type: {device.type}")
     print(f"Device index: {device.index}")
