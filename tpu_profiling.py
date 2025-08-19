@@ -67,6 +67,7 @@ def main(args: argparse.Namespace):
     for _ in tqdm(range(args.num_iters), desc="Profile iterations"):
         profile_latencies.append(run_to_completion())
     print(f"Average profile latency: {np.mean(profile_latencies):.4f}s")
+    print(f"Tokens per second: {args.batch_size * args.output_len / np.mean(profile_latencies):.2f}")
 
     return
 
@@ -123,10 +124,10 @@ if __name__ == '__main__':
 # export VLLM_TPU_PROFILE_DURATION_MS=3000
 # export VLLM_TPU_PROFILE_DELAY_MS=0
 
-python3 tpu_profiling.py \
-    --model $MODEL \
-    --input-len 4096 --output-len 128 \
-    --batch-size 512 --enforce-eager \
-    --max-model-len 2048 \
-    --tensor-parallel-size 1 \
-    --profile-result-dir profiles
+# python3 tpu_profiling.py \
+#     --model $MODEL \
+#     --input-len 4096 --output-len 128 \
+#     --batch-size 512 --enforce-eager \
+#     --max-model-len 2048 \
+#     --tensor-parallel-size 1 \
+#     --profile-result-dir profiles
