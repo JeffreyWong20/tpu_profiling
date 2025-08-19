@@ -20,21 +20,21 @@ DELAY_MS = int(os.getenv("VLLM_TPU_PROFILE_DELAY_MS", 0))
 def main(args: argparse.Namespace):
     print(args)
 
-    import torch_xla.core.xla_model as xm
-    device = xm.xla_device()
+    # import torch_xla.core.xla_model as xm
+    # device = xm.xla_device()
     _ = xp.start_server(9012)
     # print all visible devices
     # print(f"Visible devices: {xm.get_visible_devices()}")
-    print(f"Using device: {device}")
-    print(f"Device type: {device.type}")
-    print(f"Device index: {device.index}")
-    print(f"Device name: {device.name}")
-    print(f"Device memory: {device.memory}")
-    print(f"Device cores: {device.cores}")
-    return
+    # print(f"Using device: {device}")
+    # print(f"Device type: {device.type}")
+    # print(f"Device index: {device.index}")
+    # print(f"Device name: {device.name}")
+    # print(f"Device memory: {device.memory}")
+    # print(f"Device cores: {device.cores}")
+    # return
     engine_args = EngineArgs.from_cli_args(args)
     llm = LLM(**dataclasses.asdict(engine_args))
-    _ = xp.start_server(9012)
+    # _ = xp.start_server(9012)
 
     sampling_params = SamplingParams(
         temperature=0.0,
