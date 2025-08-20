@@ -146,6 +146,16 @@ def main(args: argparse.Namespace):
     decode_tps = (1.0 / avg_tpot) if avg_tpot > 0 else float("nan")
     print(f"TTFT (V1 metrics): {ttft:.4f} s")
     print(f"解码吞吐 (V1 metrics): {decode_tps:.2f} tok/s")
+
+    # save to json
+    metrics = {}
+    metrics["TTFT (V1)"] = ttft
+    metrics["Decode TPS (V1)"] = decode_tps
+    metrics["Tokens per second"] = args.batch_size * args.output_len / np.mean(profile_latencies)
+    import json
+    with open(os.path.join(profile_dir, f"metrics_{args.model}_{args.input_len}_{args.output_len}_{args.batch_size}.json"), "w") as f:
+        json.dump(metrics, f)
+
     return
 
 
