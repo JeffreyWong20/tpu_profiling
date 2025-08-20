@@ -52,6 +52,7 @@ def main(args: argparse.Namespace):
     for _ in tqdm(range(args.num_iters_warmup), desc="Warmup iterations"):
         warmup_latencies.append(run_to_completion())
     print(f"Average warmup latency: {np.mean(warmup_latencies):.4f}s")
+    print(f"Tokens per second: {args.batch_size * args.output_len / np.mean(warmup_latencies):.2f}")
 
     # Profile
     profile_dir = args.profile_result_dir
@@ -102,25 +103,47 @@ if __name__ == '__main__':
     main(args)
 
 # export XLA_HLO_DEBUG=1
-# export MODEL=meta-llama/Llama-3.1-70B-Instruct
+# export MODEL=unsloth/Meta-Llama-3.1-70B-Instruct
 # export VLLM_TPU_PROFILE_DURATION_MS=2000
 # export VLLM_TPU_PROFILE_DELAY_MS=1000
 
 # rm -rf ~/.cache/vllm/xla_cache
-# python3 profiling.py \
+# # python3 tpu_profiling.py \
+# #     --model $MODEL \
+# #     --input-len 4096 \
+# #     --output-len 128 \
+# #     --batch-size 512 \
+# #     --enforce-eager \
+# #     --profile-result-dir profiles \
+# #     --max-model-len 4352 --tensor-parallel-size 8
+
+# # 1. 设置 HF_HOME 为 /dev/shm/hf_home
+# mkdir -p /dev/shm/hf_home
+# export HF_HOME=/dev/shm/hf_home
+
+# # table 1:16384 tokens per batch
+# python3 tpu_profiling.py \
 #     --model $MODEL \
-#     --input-len 1 \
+#     --input-len 4096 \
 #     --output-len 128 \
-#     --batch-size 32 \
+#     --batch-size 512 \
+#     --enforce-eager \
+#     --max-num-batched-tokens 16384 \
+#     --profile-result-dir profiles \
+#     --max-model-len 4352 --tensor-parallel-size 8
+
+# # table 2: 5600 tokens per batch
+# python3 tpu_profiling.py \
+#     --model $MODEL \
+#     --input-len 5600 \
+#     --output-len 83000 \
+#     --batch-size 4 \
 #     --enforce-eager \
 #     --profile-result-dir profiles \
-#     --max-model-len 2048 --tensor-parallel-size 4
-
-
-
+#     --max-model-len 4352 --tensor-parallel-size 8
 
 # export XLA_HLO_DEBUG=1
-# export MODEL=Qwen/Qwen2.5-7B-Instruct
+# export MODEL=Qwen/Qwen2.5-7B-Instruct-1M
 # export VLLM_TPU_PROFILE_DURATION_MS=3000
 # export VLLM_TPU_PROFILE_DELAY_MS=0
 
@@ -128,6 +151,15 @@ if __name__ == '__main__':
 #     --model $MODEL \
 #     --input-len 4096 --output-len 128 \
 #     --batch-size 512 --enforce-eager \
-#     --max-model-len 2048 \
+#     --max-model-len 4352 \
+#     --max-num-batched-tokens 16384 \
 #     --tensor-parallel-size 1 \
+#     --profile-result-dir profiles
+
+
+# python3 tpu_profiling.py \
+#     --model $MODEL \
+#     --input-len 5600 --output-len 83000 \
+#     --batch-size 4 --enforce-eager \
+#     --tensor-parallel-size 4 \
 #     --profile-result-dir profiles
