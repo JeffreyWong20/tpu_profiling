@@ -153,7 +153,7 @@ def main(args: argparse.Namespace):
     metrics["Decode TPS (V1)"] = decode_tps
     metrics["Tokens per second"] = args.batch_size * args.output_len / np.mean(profile_latencies)
     import json
-    with open(f"metrics_{args.model}_{args.input_len}_{args.output_len}_{args.batch_size}.json", "w") as f:
+    with open(f"metrics_{args.model.replace('/', '_')}_{args.input_len}_{args.output_len}_{args.batch_size}.json", "w") as f:
         json.dump(metrics, f)
 
     return
