@@ -1,3 +1,7 @@
+# 1. 设置 HF_HOME 为 /dev/shm/hf_home
+mkdir -p /dev/shm/hf_home
+export HF_HOME=/dev/shm/hf_home
+
 export XLA_HLO_DEBUG=1
 export MODEL=unsloth/Meta-Llama-3.1-70B-Instruct
 export VLLM_TPU_PROFILE_DURATION_MS=2000
