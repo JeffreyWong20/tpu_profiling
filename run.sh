@@ -16,7 +16,7 @@ python3 tpu_profiling_ttft.py \
     --enforce-eager \
     --profile-result-dir profiles \
     --tensor-parallel-size 8 \
-    --num-iters-warmup 2
+    --num-iters-warmup 1
 
 
 export XLA_HLO_DEBUG=1
@@ -32,4 +32,4 @@ python3 tpu_profiling_ttft.py \
     --enforce-eager \
     --profile-result-dir profiles \
     --tensor-parallel-size 8 \
-    --num-iters-warmup 2
+    --num-iters-warmup 1
