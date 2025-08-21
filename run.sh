@@ -14,7 +14,6 @@ python3 tpu_profiling_ttft.py \
     --output-len 83000 \
     --batch-size 4 \
     --enforce-eager \
-    --profile-result-dir profiles \
     --tensor-parallel-size 8 \
     --num-iters-warmup 1
 
