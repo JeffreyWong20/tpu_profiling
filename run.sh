@@ -8,7 +8,7 @@ export VLLM_TPU_PROFILE_DURATION_MS=2000
 export VLLM_TPU_PROFILE_DELAY_MS=1000
 
 
-python3 tpu_profiling.py \
+python3 tpu_profiling_ttft.py \
     --model $MODEL \
     --input-len 5600 \
     --output-len 83000 \
@@ -24,7 +24,7 @@ export MODEL=RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w8a8
 export VLLM_TPU_PROFILE_DURATION_MS=3000
 export VLLM_TPU_PROFILE_DELAY_MS=0
 
-python3 tpu_profiling.py \
+python3 tpu_profiling_ttft.py \
     --model $MODEL \
     --input-len 5600 \
     --output-len 83000 \
