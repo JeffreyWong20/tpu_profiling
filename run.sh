@@ -12,7 +12,7 @@ python3 tpu_profiling_ttft.py \
     --model $MODEL \
     --input-len 5600 \
     --output-len 83000 \
-    --batch-size 4 \
+    --batch-size 2 \
     --enforce-eager \
     --tensor-parallel-size 8 \
     --num-iters-warmup 1
