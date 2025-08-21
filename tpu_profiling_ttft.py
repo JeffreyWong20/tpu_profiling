@@ -76,6 +76,7 @@ def _metrics_delta(before: dict, after: dict):
 
 def main(args: argparse.Namespace):
     print(args)
+    print(f"running ttft profiling")
     req_max_len = _required_len_for(args.input_len, args.output_len)
     args.max_num_batched_tokens = max(req_max_len, args.batch_size, 16384)
     args.max_model_len = req_max_len
